@@ -1,5 +1,4 @@
 import time
-import speech_recognition
 import speech_recognition as sr
 import pytils
 import config_friday
@@ -40,7 +39,7 @@ rec = vosk.KaldiRecognizer(model, sample_rate)
 q = queue.Queue()
 
 
-def q_callback(indata, frames, time, status):
+def q_callback(indata, status):
     if status:
         print(status, file=sys.stderr)
     q.put(bytes(indata))
@@ -65,18 +64,6 @@ def fun_str_start():
     stream.start()
 
 
-"""    print(f"Распознано: {voice}")
-    cmd = recognize_cmd(filter_cmd(voice))
-    if not voice.startswith(config_friday.VA_ALIAS):
-        if cmd['cmd'] not in config_friday.VA_CMD_LIST.keys():
-            print('Да, сэр')
-        else:
-            execute_cmd(cmd['cmd'])
-            cmd_work(cmd['cmd'])
-            cmd_game(cmd['cmd'])
-            pc_config(cmd['cmd'])
-            cmd_dialog(cmd['cmd'])
-"""
 
 
 def va_respond(voice: str):
@@ -97,13 +84,8 @@ def va_respond(voice: str):
 
 def filter_cmd(raw_voice: str):
     cmd = raw_voice
-    #
     for x in config_friday.VA_ALIAS:
         cmd = cmd.replace(x, "").strip()
-
-    # for x in config.VA_TBR:
-    #     cmd = cmd.replace(x, "").strip()
-
     return cmd
 
 
@@ -136,7 +118,6 @@ def time_fix():
     else:
         text_time = f"Сейчас {num2words.num2words(x, lang='ru')}  {num2words.num2words(y, lang='ru')} "
         tts.va_speak(text_time)
-
     pass
 
 
@@ -164,7 +145,6 @@ def weather_fix():
     temp = ''  # переменная для записи склонения градсов
     if rounted % 10 == 1 and rounted % 100 != 11:
         temp += 'граудс'
-
     elif rounted % 10 in [2, 3, 4] and rounted % 100 not in [12, 13, 14]:
         temp += 'градуса'
     else:
@@ -184,12 +164,10 @@ def execute_cmd(cmd: str):
         text = "Я умею: рассказывать анекдоты, и открывать сторонние приложенияя. "
         tts.va_speak(text)
         pass
-
     elif cmd == 'stop':
         stream.stop()
         playsound(os.getcwd() + '/sound7/greet3.wav')
-        return main()
-
+        pass
     elif cmd == 'hot_word':
         playsound('F:/GTA5RP/Friday/sound1/greet1.wav')
 
@@ -197,18 +175,14 @@ def execute_cmd(cmd: str):
         jokes = ['Как смеются программисты? ... ехе ехе ехе',
                  'ЭсКьюЭль запрос заходит в бар, подходит к двум столам и спрашивает .. «м+ожно присоединиться?»',
                  'Программист это машина для преобразования кофе в код']
-
         tts.va_speak(random.choice(jokes))
-
     elif cmd == 'open_browser':
         playsound('F:/GTA5RP/Friday/sound1/greet1.wav')
 
         webbrowser.open("https://www.google.com")
-
     elif cmd == 'open_youtube':
         playsound('F:/GTA5RP/Friday/sound6/greet2.wav')
         webbrowser.open("https://www.youtube.com/")
-
     elif cmd == 'open_music':
         pg.click(x=1751, y=1059)
         time.sleep(1)
@@ -221,7 +195,6 @@ def execute_cmd(cmd: str):
         webbrowser.open("https://music.yandex.ru/home")
         time.sleep(4)
         pg.click(x=326, y=1001)
-
     elif cmd == 'conect':
         playsound(os.getcwd() + '/sound6/greet2.wav')
         pg.click(x=1751, y=1059)
@@ -230,9 +203,7 @@ def execute_cmd(cmd: str):
         time.sleep(1)
         pg.click(x=1686, y=849)
         pg.click(x=1717, y=725)
-
     elif cmd == 'unconect':
-
         playsound(os.getcwd() + '/sound6/greet2.wav')
         pg.click(x=1751, y=1059)
         time.sleep(1)
@@ -242,23 +213,16 @@ def execute_cmd(cmd: str):
         pg.click(x=1717, y=725)
     elif cmd == 'my_wave':
         pg.click(x=719, y=449)
-
     elif cmd == 'stop_music':
         pg.click(x=269, y=1008)
-
     elif cmd == 'next_music':
         pg.click(x=321, y=1004)
-
-
     elif cmd == 'time_now':
         return time_fix()
-
     elif cmd == 'data_now':
         return fun_data_fix()
-
     elif cmd == 'weather':
         return weather_fix()
-
     elif cmd == 'open_perp':
         webbrowser.open("https://www.perplexity.ai/")
         playsound('F:/GTA5RP/Friday/sound6/greet2.wav')
@@ -269,25 +233,20 @@ def pc_config(cmd: str):
     if cmd == 'close_pc':
         playsound(os.getcwd() + '/sound7/greet3.wav')
         os.system('shutdown -s -t 2')
-
     elif cmd == 'restart_pc':
         playsound(os.getcwd() + '/sound6/greet2.wav')
         os.system('shutdown /r /t 1')
-
     elif cmd == 'sleap_pc':
         playsound(os.getcwd() + '/sound1/greet1.wav')
         os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
-
     elif cmd == 'scrin_host':
         playsound(os.getcwd() + '/sound2/ok1.wav')
         pg.screenshot('F:/скриншоты/scrin.png')
         os.startfile('F:/скриншоты')
-
     elif cmd == 'sound_on':
         devices = AudioUtilities.GetSpeakers()  # получаем доступ к динамикам
         interface = devices.Activate(
             IAudioEndpointVolume._iid_, CLSCTX_ALL, None)  # активизируем интерфейс звука
-
         volume = cast(interface, POINTER(IAudioEndpointVolume))
         volume.SetMasterVolumeLevel(0.0, None)  # управления громкостью (максимальный громкость)
         playsound(os.getcwd() + '/sound5/ok3.wav')
@@ -296,7 +255,6 @@ def pc_config(cmd: str):
         devices = AudioUtilities.GetSpeakers()  # получаем доступ к динамикам
         interface = devices.Activate(
             IAudioEndpointVolume._iid_, CLSCTX_ALL, None)  # активизируем интерфейс звука
-
         volume = cast(interface, POINTER(IAudioEndpointVolume))
         volume.SetMasterVolumeLevel(-43, None)  # управления громкостью (минимальной громкость)
 
@@ -317,11 +275,9 @@ def cmd_game(cmd: str):
         os.startfile('C:/control/DS4Windows/DS4Windows.exe')
         time.sleep(2)
         os.startfile('F:/Games/Stray/Stray.exe')
-
     elif cmd == 'open_steam':
         playsound(os.getcwd() + '/sound4/ok2.wav')
         os.startfile('C:/Program Files (x86)/Steam/steam.exe')
-
     elif cmd == 'game_pad_start':
         playsound(os.getcwd() + '/sound5/ok3.wav')
         os.startfile('C:/control/DS4Windows/DS4Windows.exe')
@@ -331,41 +287,9 @@ def cmd_dialog(cmd2: str):
     if cmd2 == "good":
         x = ["с+пасибо.", "спасибо моему разработчику.", "с+пасибо вы тоже."]
         tts.va_speak(random.choice(x))
-
     elif cmd2 == "un_good":
         x = ["Очень тонкое замечание.", "простите меня сэрр.", "учту"]
         tts.va_speak(random.choice(x))
-
-
-sr = speech_recognition.Recognizer()
-
-
-def list_comands():
-    try:
-        with speech_recognition.Microphone() as mic:
-            sr.adjust_for_ambient_noise(source=mic, duration=0.5)
-            audio = sr.listen(source=mic)
-            query = sr.recognize_google(audio_data=audio, language='ru-RU').lower()
-            return query
-
-    except speech_recognition.UnknownValueError:
-        query = list_comands()
-        if query is None:
-            stream.start()
-
-
-def main():
-    query = list_comands()
-    print(query)
-    if query == 'старт':
-        stream.start()
-        playsound(os.getcwd() + '/sound1/greet1.wav')
-    elif query is None:
-        stream.start()
-        main()
-    else:
-        print('не понимаю')
-        main()
 
 
 # начать прослушивание команд
